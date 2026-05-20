@@ -162,7 +162,7 @@ export default function AuditPage() {
             <p className="text-sm text-muted-foreground py-4">No audit logs found</p>
           ) : (
             <div>
-              <div className="overflow-x-auto min-h-[280px]">
+              <div className="overflow-x-auto min-h-[280px] hide-scrollbar">
                 <table className="w-full text-sm table-auto min-w-[700px]">
                   <thead>
                     <tr className="border-b border-border">
