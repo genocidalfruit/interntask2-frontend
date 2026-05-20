@@ -38,6 +38,7 @@ import { getDashboardVariant } from "@/lib/role-utils";
 import { TicketDetailModal } from "@/components/tickets/ticket-detail-modal";
 import { RequirePermission } from "@/lib/require-permission";
 import Link from "next/link";
+import { toast } from "sonner";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Tooltip);
 
@@ -87,14 +88,22 @@ function AdminDashboard({
 
   async function updateTicketStatus(ticketId: string, newStatus: string) {
     try {
-      await fetch(`${getApiUrl()}/api/v1/tickets/${ticketId}/status`, {
+      const res = await fetch(`${getApiUrl()}/api/v1/tickets/${ticketId}/status`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({ status: newStatus }),
       });
+      const data = await res.json();
+      if (!res.ok) {
+        toast.error(data.message || "Failed to update status");
+        return;
+      }
+      toast.success(`Status updated to ${newStatus.replace("_", " ")}`);
       fetchData();
-    } catch {}
+    } catch {
+      toast.error("Failed to update status");
+    }
   }
 
   const totalAssets = assets.length;
@@ -674,14 +683,22 @@ function TechnicianDashboard({
 
   async function updateTicketStatus(ticketId: string, newStatus: string) {
     try {
-      await fetch(`${getApiUrl()}/api/v1/tickets/${ticketId}/status`, {
+      const res = await fetch(`${getApiUrl()}/api/v1/tickets/${ticketId}/status`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({ status: newStatus }),
       });
+      const data = await res.json();
+      if (!res.ok) {
+        toast.error(data.message || "Failed to update status");
+        return;
+      }
+      toast.success(`Status updated to ${newStatus.replace("_", " ")}`);
       fetchData();
-    } catch {}
+    } catch {
+      toast.error("Failed to update status");
+    }
   }
 
   const assignedTickets = tickets.filter((t) => t.assignedTo && (t.assignedTo._id === userId || t.assignedTo === userId));

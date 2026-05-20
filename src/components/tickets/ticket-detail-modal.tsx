@@ -8,14 +8,13 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { Clock, User, Calendar, AlertCircle, RefreshCw, Pencil, ArrowUp } from "lucide-react";
+import { Clock, User, Calendar, AlertCircle, RefreshCw } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { TicketModal } from "./ticket-modal";
-import { PermissionGuard } from "@/components/shared/permission-guard";
 import { usePermission } from "@/lib/permissions";
 import { toast } from "sonner";
 
@@ -36,6 +35,12 @@ const statusColors: Record<string, string> = {
   CLOSED: "bg-muted text-muted-foreground",
 };
 
+const STATUS_OPTIONS = ["OPEN", "IN_PROGRESS", "PENDING", "RESOLVED", "CLOSED"] as const;
+
+function formatStatus(status: string) {
+  return status.replace("_", " ");
+}
+
 export function TicketDetailModal({
   ticketId,
   open,
@@ -48,9 +53,8 @@ export function TicketDetailModal({
   const [ticket, setTicket] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [editingTicket, setEditingTicket] = useState<any>(null);
-  const [escalating, setEscalating] = useState(false);
   const { hasPermission } = usePermission();
+  const canEditTickets = hasPermission("ticket.update");
 
   async function fetchTicket() {
     if (!ticketId || !open) return;
@@ -73,25 +77,24 @@ export function TicketDetailModal({
 
   useEffect(() => { fetchTicket(); }, [ticketId, open]);
 
-  async function handleEscalate() {
-    if (!ticketId || ticket?.priority === "CRITICAL") return;
-    setEscalating(true);
+  async function handleStatusChange(newStatus: string) {
+    if (!ticketId) return;
     try {
-      const res = await fetch(`${getApiUrl()}/api/v1/tickets/${ticketId}/escalate`, {
+      const res = await fetch(`${getApiUrl()}/api/v1/tickets/${ticketId}/status`, {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
         credentials: "include",
+        body: JSON.stringify({ status: newStatus }),
       });
       const data = await res.json();
       if (!res.ok) {
-        toast.error(data.message || "Failed to escalate ticket");
+        toast.error(data.message || "Failed to update status");
         return;
       }
-      toast.success(`Escalated to ${data.data.priority}`);
+      toast.success(`Status updated to ${formatStatus(newStatus)}`);
       setTicket(data.data);
     } catch {
-      toast.error("Failed to escalate ticket");
-    } finally {
-      setEscalating(false);
+      toast.error("Failed to update status");
     }
   }
 
@@ -141,35 +144,30 @@ export function TicketDetailModal({
                     {ticket.assetId?.name || "Unknown Asset"}
                   </DialogDescription>
                 </div>
-                <div className="flex items-center gap-1">
-                  <PermissionGuard permission="ticket.update">
-                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setEditingTicket(ticket)}>
-                      <Pencil className="w-4 h-4" />
-                    </Button>
-                  </PermissionGuard>
-                  <PermissionGuard permission="ticket.escalate">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8"
-                      disabled={ticket.priority === "CRITICAL" || escalating}
-                      onClick={handleEscalate}
-                    >
-                      <ArrowUp className="w-4 h-4" />
-                    </Button>
-                  </PermissionGuard>
-                </div>
               </div>
             </DialogHeader>
             <ScrollArea className="max-h-[60vh] pr-4">
               <div className="space-y-4">
-                <div className="flex gap-2">
+                <div className="flex gap-2 items-center">
                   <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${priorityColors[ticket.priority]}`}>
                     {ticket.priority}
                   </span>
-                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusColors[ticket.status]}`}>
-                    {ticket.status}
-                  </span>
+                  {canEditTickets ? (
+                    <Select value={ticket.status} onValueChange={handleStatusChange}>
+                      <SelectTrigger className={`h-6 w-auto px-2 py-0.5 text-xs font-medium border-0 ${statusColors[ticket.status]}`}>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {STATUS_OPTIONS.map((s) => (
+                          <SelectItem key={s} value={s}>{formatStatus(s)}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusColors[ticket.status]}`}>
+                      {ticket.status}
+                    </span>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-2 gap-4 text-sm">
@@ -227,12 +225,6 @@ export function TicketDetailModal({
         ) : (
           <div className="py-8 text-center text-sm text-muted-foreground">Ticket not found</div>
         )}
-        <TicketModal
-          open={!!editingTicket}
-          onOpenChange={(open) => !open && setEditingTicket(null)}
-          ticket={editingTicket}
-          onSuccess={fetchTicket}
-        />
       </DialogContent>
     </Dialog>
   );
