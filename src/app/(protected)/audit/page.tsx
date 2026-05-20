@@ -47,14 +47,14 @@ function DiffView({ before, after }: { before?: Record<string, unknown>; after?:
         const newVal = after?.[key];
         if (oldVal === newVal) return null;
         return (
-          <div key={key} className="flex items-start gap-2">
-            <span className="text-muted-foreground font-medium min-w-[80px]">{key}:</span>
-            <div className="flex flex-col gap-0.5">
+          <div key={key} className="flex items-start gap-2 min-w-0">
+            <span className="text-muted-foreground font-medium min-w-[80px] shrink-0">{key}:</span>
+            <div className="flex flex-col gap-0.5 min-w-0">
               {oldVal !== undefined && oldVal !== null && (
-                <span className="text-red-400 line-through">{String(oldVal)}</span>
+                <span className="text-red-400 line-through break-words">{String(oldVal)}</span>
               )}
               {newVal !== undefined && newVal !== null && (
-                <span className="text-emerald-400">{String(newVal)}</span>
+                <span className="text-emerald-400 break-words">{String(newVal)}</span>
               )}
             </div>
           </div>
@@ -162,15 +162,15 @@ export default function AuditPage() {
             <p className="text-sm text-muted-foreground py-4">No audit logs found</p>
           ) : (
             <div>
-              <div className="overflow-x-auto min-h-[280px] hide-scrollbar">
-                <table className="w-full text-sm">
+              <div className="min-h-[280px]">
+                <table className="w-full text-sm table-fixed">
                   <thead>
                     <tr className="border-b border-border">
                       <th className="text-left py-3 px-4 font-normal text-muted-foreground w-8"></th>
                       <th className="text-left py-3 px-4 font-normal text-muted-foreground">Action</th>
-                      <th className="text-left py-3 px-4 font-normal text-muted-foreground">Entity</th>
-                      <th className="text-left py-3 pl-4 pr-8 font-normal text-muted-foreground">Actor</th>
-                      <th className="text-right py-3 px-4 font-normal text-muted-foreground">Time</th>
+                      <th className="text-left py-3 px-4 font-normal text-muted-foreground w-[100px]">Entity</th>
+                      <th className="text-left py-3 px-4 font-normal text-muted-foreground w-[120px]">Actor</th>
+                      <th className="text-right py-3 px-4 font-normal text-muted-foreground w-[80px]">Time</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -186,29 +186,29 @@ export default function AuditPage() {
                           style={{ animationDelay: `${i * 50}ms` }}
                           onClick={() => setExpandedLog(isExpanded ? null : log._id)}
                         >
-                          <td className="py-3 px-2">
+                          <td className="py-3 px-2 align-top">
                             {hasChanges && (
                               <span className="text-muted-foreground">
                                 {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                               </span>
                             )}
                           </td>
-                          <td className="py-3 px-4">
-                            <div className="flex items-center gap-3 min-w-0">
-                              <div className="w-8 h-8 rounded-md bg-secondary flex items-center justify-center shrink-0">
+                          <td className="py-3 px-4 align-top">
+                            <div className="flex items-start gap-3 min-w-0">
+                              <div className="w-8 h-8 rounded-md bg-secondary flex items-center justify-center shrink-0 mt-0.5">
                                 <Icon className="w-4 h-4 text-muted-foreground" />
                               </div>
-                              <span className="font-medium truncate">{log.action}</span>
+                              <span className="font-medium break-words">{log.action}</span>
                             </div>
                           </td>
-                          <td className="py-3 px-4 text-muted-foreground whitespace-nowrap">{log.entityType}</td>
-                          <td className="py-3 pl-4 pr-8 text-muted-foreground">
+                          <td className="py-3 px-4 text-muted-foreground whitespace-nowrap align-top">{log.entityType}</td>
+                          <td className="py-3 px-4 text-muted-foreground whitespace-nowrap align-top">
                             <span className="inline-flex items-center gap-1 min-w-0">
                               <User className="w-3 h-3 shrink-0" />
                               <span className="truncate">{log.actor?.name || "Unknown"}</span>
                             </span>
                           </td>
-                          <td className="py-3 px-4 text-right text-muted-foreground whitespace-nowrap">{timeAgo(log.createdAt)}</td>
+                          <td className="py-3 px-4 text-right text-muted-foreground whitespace-nowrap align-top">{timeAgo(log.createdAt)}</td>
                         </tr>
                         {isExpanded && hasChanges && (
                           <tr className="border-b border-border/50 last:border-0 bg-secondary/20">
