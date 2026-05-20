@@ -162,15 +162,15 @@ export default function AuditPage() {
             <p className="text-sm text-muted-foreground py-4">No audit logs found</p>
           ) : (
             <div>
-              <div className="min-h-[280px]">
-                <table className="w-full text-sm table-fixed">
+              <div className="overflow-x-auto min-h-[280px]">
+                <table className="w-full text-sm table-auto min-w-[700px]">
                   <thead>
                     <tr className="border-b border-border">
                       <th className="text-left py-3 px-4 font-normal text-muted-foreground w-8"></th>
                       <th className="text-left py-3 px-4 font-normal text-muted-foreground">Action</th>
-                      <th className="text-left py-3 px-4 font-normal text-muted-foreground w-[100px]">Entity</th>
-                      <th className="text-left py-3 px-4 font-normal text-muted-foreground w-[120px]">Actor</th>
-                      <th className="text-right py-3 px-4 font-normal text-muted-foreground w-[80px]">Time</th>
+                      <th className="text-left py-3 px-4 font-normal text-muted-foreground whitespace-nowrap">Entity</th>
+                      <th className="text-left py-3 px-4 font-normal text-muted-foreground whitespace-nowrap">Actor</th>
+                      <th className="text-right py-3 px-4 font-normal text-muted-foreground whitespace-nowrap">Time</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -203,9 +203,9 @@ export default function AuditPage() {
                           </td>
                           <td className="py-3 px-4 text-muted-foreground whitespace-nowrap align-top">{log.entityType}</td>
                           <td className="py-3 px-4 text-muted-foreground whitespace-nowrap align-top">
-                            <span className="inline-flex items-center gap-1 min-w-0">
+                            <span className="inline-flex items-center gap-1">
                               <User className="w-3 h-3 shrink-0" />
-                              <span className="truncate">{log.actor?.name || "Unknown"}</span>
+                              <span>{log.actor?.name || "Unknown"}</span>
                             </span>
                           </td>
                           <td className="py-3 px-4 text-right text-muted-foreground whitespace-nowrap align-top">{timeAgo(log.createdAt)}</td>
