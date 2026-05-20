@@ -11,11 +11,13 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { Clock, User, Calendar, AlertCircle, RefreshCw, Pencil } from "lucide-react";
+import { Clock, User, Calendar, AlertCircle, RefreshCw, Pencil, ArrowUp } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { TicketModal } from "./ticket-modal";
 import { PermissionGuard } from "@/components/shared/permission-guard";
+import { usePermission } from "@/lib/permissions";
+import { toast } from "sonner";
 
 import { getApiUrl } from "@/lib/api-url";
 
@@ -47,6 +49,8 @@ export function TicketDetailModal({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [editingTicket, setEditingTicket] = useState<any>(null);
+  const [escalating, setEscalating] = useState(false);
+  const { hasPermission } = usePermission();
 
   async function fetchTicket() {
     if (!ticketId || !open) return;
@@ -68,6 +72,28 @@ export function TicketDetailModal({
   }
 
   useEffect(() => { fetchTicket(); }, [ticketId, open]);
+
+  async function handleEscalate() {
+    if (!ticketId || ticket?.priority === "CRITICAL") return;
+    setEscalating(true);
+    try {
+      const res = await fetch(`${getApiUrl()}/api/v1/tickets/${ticketId}/escalate`, {
+        method: "POST",
+        credentials: "include",
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        toast.error(data.message || "Failed to escalate ticket");
+        return;
+      }
+      toast.success(`Escalated to ${data.data.priority}`);
+      setTicket(data.data);
+    } catch {
+      toast.error("Failed to escalate ticket");
+    } finally {
+      setEscalating(false);
+    }
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -115,11 +141,24 @@ export function TicketDetailModal({
                     {ticket.assetId?.name || "Unknown Asset"}
                   </DialogDescription>
                 </div>
-                <PermissionGuard permission="ticket.update">
-                  <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setEditingTicket(ticket)}>
-                    <Pencil className="w-4 h-4" />
-                  </Button>
-                </PermissionGuard>
+                <div className="flex items-center gap-1">
+                  <PermissionGuard permission="ticket.update">
+                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setEditingTicket(ticket)}>
+                      <Pencil className="w-4 h-4" />
+                    </Button>
+                  </PermissionGuard>
+                  <PermissionGuard permission="ticket.escalate">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8"
+                      disabled={ticket.priority === "CRITICAL" || escalating}
+                      onClick={handleEscalate}
+                    >
+                      <ArrowUp className="w-4 h-4" />
+                    </Button>
+                  </PermissionGuard>
+                </div>
               </div>
             </DialogHeader>
             <ScrollArea className="max-h-[60vh] pr-4">
