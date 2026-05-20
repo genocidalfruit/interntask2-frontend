@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ScrollText, User, Package, Ticket, Users, Shield, Settings, Bell, BarChart3, ChevronLeft, ChevronRight, RefreshCw, AlertCircle, Search } from "lucide-react";
+import { ScrollText, User, Package, Ticket, Users, Shield, Settings, Bell, BarChart3, ChevronLeft, ChevronRight, RefreshCw, AlertCircle, Search, ChevronDown, ChevronUp } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { RequirePermission } from "@/lib/require-permission";
 
@@ -34,12 +34,43 @@ function getEntityIcon(entityType: string, action: string) {
   return icon;
 }
 
+function DiffView({ before, after }: { before?: Record<string, unknown>; after?: Record<string, unknown> }) {
+  if (!before && !after) return null;
+
+  const allKeys = new Set([...Object.keys(before || {}), ...Object.keys(after || {})]);
+  const keys = Array.from(allKeys);
+
+  return (
+    <div className="mt-2 p-3 rounded-md bg-secondary/50 text-xs space-y-1">
+      {keys.map((key) => {
+        const oldVal = before?.[key];
+        const newVal = after?.[key];
+        if (oldVal === newVal) return null;
+        return (
+          <div key={key} className="flex items-start gap-2">
+            <span className="text-muted-foreground font-medium min-w-[80px]">{key}:</span>
+            <div className="flex flex-col gap-0.5">
+              {oldVal !== undefined && oldVal !== null && (
+                <span className="text-red-400 line-through">{String(oldVal)}</span>
+              )}
+              {newVal !== undefined && newVal !== null && (
+                <span className="text-emerald-400">{String(newVal)}</span>
+              )}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 export default function AuditPage() {
   const [logs, setLogs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
+  const [expandedLog, setExpandedLog] = useState<string | null>(null);
   const perPage = 10;
 
   async function fetchData() {
@@ -135,22 +166,33 @@ export default function AuditPage() {
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-border">
+                      <th className="text-left py-3 px-4 font-normal text-muted-foreground w-8"></th>
                       <th className="text-left py-3 px-4 font-normal text-muted-foreground">Action</th>
                       <th className="text-left py-3 px-4 font-normal text-muted-foreground">Entity</th>
                       <th className="text-left py-3 px-4 font-normal text-muted-foreground">Actor</th>
-                      <th className="text-left py-3 px-4 font-normal text-muted-foreground">Trace</th>
                       <th className="text-right py-3 px-4 font-normal text-muted-foreground">Time</th>
                     </tr>
                   </thead>
                   <tbody>
                     {paginated.map((log, i) => {
                       const Icon = getEntityIcon(log.entityType, log.action);
+                      const isExpanded = expandedLog === log._id;
+                      const hasChanges = log.before || log.after;
                       return (
+                        <>
                         <tr
                           key={log._id}
-                          className="border-b border-border/50 last:border-0 transition-colors duration-150 hover:bg-secondary/30 animate-fade-up"
+                          className="border-b border-border/50 last:border-0 transition-colors duration-150 hover:bg-secondary/30 animate-fade-up cursor-pointer"
                           style={{ animationDelay: `${i * 50}ms` }}
+                          onClick={() => setExpandedLog(isExpanded ? null : log._id)}
                         >
+                          <td className="py-3 px-2">
+                            {hasChanges && (
+                              <span className="text-muted-foreground">
+                                {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                              </span>
+                            )}
+                          </td>
                           <td className="py-3 px-4">
                             <div className="flex items-center gap-3 min-w-0">
                               <div className="w-8 h-8 rounded-md bg-secondary flex items-center justify-center shrink-0">
@@ -166,9 +208,16 @@ export default function AuditPage() {
                               <span className="truncate">{log.actor?.name || "Unknown"}</span>
                             </span>
                           </td>
-                          <td className="py-3 px-4 text-muted-foreground whitespace-nowrap">{log.traceId || "-"}</td>
                           <td className="py-3 px-4 text-right text-muted-foreground whitespace-nowrap">{timeAgo(log.createdAt)}</td>
                         </tr>
+                        {isExpanded && hasChanges && (
+                          <tr className="border-b border-border/50 last:border-0 bg-secondary/20">
+                            <td colSpan={5} className="py-2 px-4 sm:px-12">
+                              <DiffView before={log.before} after={log.after} />
+                            </td>
+                          </tr>
+                        )}
+                        </>
                       );
                     })}
                   </tbody>
