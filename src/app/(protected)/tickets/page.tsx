@@ -35,7 +35,7 @@ import { RequirePermission } from "@/lib/require-permission";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { getApiUrl } from "@/lib/api-url";
 
 export default function TicketsPage() {
   const [tickets, setTickets] = useState<any[]>([]);
@@ -59,7 +59,7 @@ export default function TicketsPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`${API_URL}/api/v1/tickets`, {
+      const res = await fetch(`${getApiUrl()}/api/v1/tickets`, {
         credentials: "include",
       });
       if (!res.ok) throw new Error("Failed to fetch tickets");
@@ -100,7 +100,7 @@ export default function TicketsPage() {
     if (!deleteId) return;
     setDeleteLoading(true);
     try {
-      await fetch(`${API_URL}/api/v1/tickets/${deleteId}`, {
+      await fetch(`${getApiUrl()}/api/v1/tickets/${deleteId}`, {
         method: "DELETE",
         credentials: "include",
       });

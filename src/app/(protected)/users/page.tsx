@@ -21,7 +21,7 @@ import { PermissionGuard } from "@/components/shared/permission-guard";
 import { RequirePermission } from "@/lib/require-permission";
 import { toast } from "sonner";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { getApiUrl } from "@/lib/api-url";
 
 export default function UsersPage() {
   const [users, setUsers] = useState<any[]>([]);
@@ -39,7 +39,7 @@ export default function UsersPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`${API_URL}/api/v1/users`, {
+      const res = await fetch(`${getApiUrl()}/api/v1/users`, {
         credentials: "include",
       });
       if (!res.ok) throw new Error("Failed to fetch users");
@@ -61,7 +61,7 @@ export default function UsersPage() {
     if (!deleteId) return;
     setDeleteLoading(true);
     try {
-      await fetch(`${API_URL}/api/v1/users/${deleteId}`, {
+      await fetch(`${getApiUrl()}/api/v1/users/${deleteId}`, {
         method: "DELETE",
         credentials: "include",
       });

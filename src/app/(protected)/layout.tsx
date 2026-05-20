@@ -24,7 +24,7 @@ import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { usePermission } from "@/lib/permissions";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { getApiUrl } from "@/lib/api-url";
 
 const allNavItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, permission: "dashboard.view" },
@@ -53,7 +53,7 @@ export default function ProtectedLayout({
   useEffect(() => {
     async function refresh() {
       try {
-        await fetch(`${API_URL}/api/v1/auth/refresh`, {
+        await fetch(`${getApiUrl()}/api/v1/auth/refresh`, {
           method: "POST",
           credentials: "include",
         });
@@ -66,7 +66,7 @@ export default function ProtectedLayout({
   useEffect(() => {
     async function fetchNotifications() {
       try {
-        const res = await fetch(`${API_URL}/api/v1/notifications/me`, {
+        const res = await fetch(`${getApiUrl()}/api/v1/notifications/me`, {
           credentials: "include",
         });
         const data = await res.json();
@@ -85,7 +85,7 @@ export default function ProtectedLayout({
 
   async function markRead(id: string) {
     try {
-      await fetch(`${API_URL}/api/v1/notifications/${id}/read`, {
+      await fetch(`${getApiUrl()}/api/v1/notifications/${id}/read`, {
         method: "PATCH",
         credentials: "include",
       });
@@ -106,7 +106,7 @@ export default function ProtectedLayout({
 
   async function handleSignOut() {
     try {
-      await fetch(`${API_URL}/api/v1/auth/logout`, {
+      await fetch(`${getApiUrl()}/api/v1/auth/logout`, {
         method: "POST",
         credentials: "include",
       });

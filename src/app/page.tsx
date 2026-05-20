@@ -15,7 +15,7 @@ import { Sun, Moon } from "lucide-react";
 import { toast } from "sonner";
 import { useTheme } from "@/lib/theme";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { getApiUrl } from "@/lib/api-url";
 
 const navMap = [
   { href: "/dashboard", perm: "dashboard.view" },
@@ -37,7 +37,7 @@ export default function LoginPage() {
     if (loading) return;
     setLoading(true);
     try {
-      const res = await fetch(`${API_URL}/api/v1/auth/login`, {
+      const res = await fetch(`${getApiUrl()}/api/v1/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",

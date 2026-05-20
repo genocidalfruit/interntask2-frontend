@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button";
 import { TicketModal } from "./ticket-modal";
 import { PermissionGuard } from "@/components/shared/permission-guard";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { getApiUrl } from "@/lib/api-url";
 
 const priorityColors: Record<string, string> = {
   CRITICAL: "bg-destructive/10 text-destructive",
@@ -53,7 +53,7 @@ export function TicketDetailModal({
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`${API_URL}/api/v1/tickets/${ticketId}`, {
+      const res = await fetch(`${getApiUrl()}/api/v1/tickets/${ticketId}`, {
         credentials: "include",
       });
       if (!res.ok) throw new Error("Failed to fetch ticket");

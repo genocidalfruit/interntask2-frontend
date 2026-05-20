@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { getApiUrl } from "@/lib/api-url";
 
 const fieldClass = cn(
   "flex h-9 w-full rounded-md border border-border bg-transparent px-3 py-1 text-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
@@ -61,7 +61,7 @@ export function AssetModal({ open, onOpenChange, asset, onSuccess }: AssetModalP
     if (!validate()) return;
     setLoading(true);
     try {
-      const url = asset ? `${API_URL}/api/v1/assets/${asset._id}` : `${API_URL}/api/v1/assets`;
+      const url = asset ? `${getApiUrl()}/api/v1/assets/${asset._id}` : `${getApiUrl()}/api/v1/assets`;
       const method = asset ? "PATCH" : "POST";
       const res = await fetch(url, {
         method,

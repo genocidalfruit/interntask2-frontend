@@ -10,7 +10,7 @@ import {
 import { usePathname, useRouter } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { getApiUrl } from "@/lib/api-url";
 const protectedRoutes = ["/dashboard", "/assets", "/tickets", "/users", "/roles", "/audit"];
 
 interface PermissionContextType {
@@ -55,7 +55,7 @@ export function PermissionProvider({
   useEffect(() => {
     let cancelled = false;
     async function fetchMe() {
-      return fetch(`${API_URL}/api/v1/auth/me`, {
+      return fetch(`${getApiUrl()}/api/v1/auth/me`, {
         credentials: "include",
       });
     }
@@ -64,7 +64,7 @@ export function PermissionProvider({
       try {
         let res = await fetchMe();
         if (!res.ok) {
-          const refreshRes = await fetch(`${API_URL}/api/v1/auth/refresh`, {
+          const refreshRes = await fetch(`${getApiUrl()}/api/v1/auth/refresh`, {
             method: "POST",
             credentials: "include",
           });

@@ -8,7 +8,7 @@ import { ScrollText, User, Package, Ticket, Users, Shield, Settings, Bell, BarCh
 import { Skeleton } from "@/components/ui/skeleton";
 import { RequirePermission } from "@/lib/require-permission";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { getApiUrl } from "@/lib/api-url";
 
 const entityIconMap: Record<string, any> = {
   Asset: Package,
@@ -46,7 +46,7 @@ export default function AuditPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`${API_URL}/api/v1/audit-logs`, { credentials: "include" });
+      const res = await fetch(`${getApiUrl()}/api/v1/audit-logs`, { credentials: "include" });
       if (!res.ok) throw new Error("Failed to fetch audit logs");
       const data = await res.json();
       setLogs(data.data || []);

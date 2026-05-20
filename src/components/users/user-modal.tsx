@@ -11,7 +11,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { getApiUrl } from "@/lib/api-url";
 
 const fieldClass =
   "flex h-9 w-full rounded-md border border-border bg-transparent px-3 py-1 text-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50";
@@ -37,7 +37,7 @@ export function UserModal({ open, onOpenChange, user, onSuccess }: UserModalProp
 
   useEffect(() => {
     setRolesLoading(true);
-    fetch(`${API_URL}/api/v1/roles`, { credentials: "include" })
+    fetch(`${getApiUrl()}/api/v1/roles`, { credentials: "include" })
       .then((r) => r.json())
       .then((d) => { setRoles(d.data || []); setRolesLoading(false); })
       .catch(() => { setRoles([]); setRolesLoading(false); });
@@ -72,7 +72,7 @@ export function UserModal({ open, onOpenChange, user, onSuccess }: UserModalProp
     if (!validate()) return;
     setLoading(true);
     try {
-      const url = user ? `${API_URL}/api/v1/users/${user._id}` : `${API_URL}/api/v1/users`;
+      const url = user ? `${getApiUrl()}/api/v1/users/${user._id}` : `${getApiUrl()}/api/v1/users`;
       const method = user ? "PATCH" : "POST";
       const body: any = { name: formData.name, email: formData.email, roleId: formData.roleId };
       if (!user && formData.password) body.password = formData.password;

@@ -10,7 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { getApiUrl } from "@/lib/api-url";
 
 const fieldClass =
   "flex h-9 w-full rounded-md border border-border bg-transparent px-3 py-1 text-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50";
@@ -36,7 +36,7 @@ export function TicketModal({ open, onOpenChange, ticket, onSuccess }: TicketMod
 
   useEffect(() => {
     setAssetsLoading(true);
-    fetch(`${API_URL}/api/v1/assets`, { credentials: "include" })
+    fetch(`${getApiUrl()}/api/v1/assets`, { credentials: "include" })
       .then((r) => r.json())
       .then((d) => { setAssets(d.data || []); setAssetsLoading(false); })
       .catch(() => { setAssets([]); setAssetsLoading(false); });
@@ -69,14 +69,14 @@ export function TicketModal({ open, onOpenChange, ticket, onSuccess }: TicketMod
     try {
       let res;
       if (isEdit) {
-        res = await fetch(`${API_URL}/api/v1/tickets/${ticket._id}`, {
+        res = await fetch(`${getApiUrl()}/api/v1/tickets/${ticket._id}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           credentials: "include",
           body: JSON.stringify({ priority: formData.priority, status: formData.status }),
         });
       } else {
-        res = await fetch(`${API_URL}/api/v1/tickets`, {
+        res = await fetch(`${getApiUrl()}/api/v1/tickets`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           credentials: "include",

@@ -45,7 +45,7 @@ import {
   Check,
 } from "lucide-react";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { getApiUrl } from "@/lib/api-url";
 
 const allPermissions = [
   "asset.view",
@@ -157,8 +157,8 @@ export function RoleModal({
     setLoading(true);
     try {
       const url = role
-        ? `${API_URL}/api/v1/roles/${role._id}`
-        : `${API_URL}/api/v1/roles`;
+        ? `${getApiUrl()}/api/v1/roles/${role._id}`
+        : `${getApiUrl()}/api/v1/roles`;
       const method = role ? "PATCH" : "POST";
       const res = await fetch(url, {
         method,

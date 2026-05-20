@@ -41,7 +41,7 @@ import Link from "next/link";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Tooltip);
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { getApiUrl } from "@/lib/api-url";
 
 function useNordColors(theme: string) {
   return {
@@ -87,7 +87,7 @@ function AdminDashboard({
 
   async function updateTicketStatus(ticketId: string, newStatus: string) {
     try {
-      await fetch(`${API_URL}/api/v1/tickets/${ticketId}/status`, {
+      await fetch(`${getApiUrl()}/api/v1/tickets/${ticketId}/status`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -674,7 +674,7 @@ function TechnicianDashboard({
 
   async function updateTicketStatus(ticketId: string, newStatus: string) {
     try {
-      await fetch(`${API_URL}/api/v1/tickets/${ticketId}/status`, {
+      await fetch(`${getApiUrl()}/api/v1/tickets/${ticketId}/status`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -1064,8 +1064,8 @@ export default function DashboardPage() {
     try {
       const params = variant === "technician" ? "?scope=assigned" : variant === "employee" ? "?scope=mine" : "";
       const [assetsRes, ticketsRes] = await Promise.all([
-        fetch(`${API_URL}/api/v1/assets${variant === "employee" ? "?scope=assigned" : ""}`, { credentials: "include" }),
-        fetch(`${API_URL}/api/v1/tickets${params}`, { credentials: "include" }),
+        fetch(`${getApiUrl()}/api/v1/assets${variant === "employee" ? "?scope=assigned" : ""}`, { credentials: "include" }),
+        fetch(`${getApiUrl()}/api/v1/tickets${params}`, { credentials: "include" }),
       ]);
       if (!assetsRes.ok || !ticketsRes.ok) throw new Error("Failed to fetch data");
       const assetsData = await assetsRes.json();

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Sun, Moon, ShieldOff } from "lucide-react";
 import { useTheme } from "@/lib/theme";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { getApiUrl } from "@/lib/api-url";
 
 export default function NotAuthorizedPage() {
   const router = useRouter();
@@ -41,7 +41,7 @@ export default function NotAuthorizedPage() {
             variant="ghost"
             onClick={async () => {
               try {
-                await fetch(`${API_URL}/api/v1/auth/logout`, {
+                await fetch(`${getApiUrl()}/api/v1/auth/logout`, {
                   method: "POST",
                   credentials: "include",
                 });

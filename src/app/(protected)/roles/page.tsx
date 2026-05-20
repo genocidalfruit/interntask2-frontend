@@ -11,7 +11,7 @@ import { PermissionGuard } from "@/components/shared/permission-guard";
 import { RequirePermission } from "@/lib/require-permission";
 import { toast } from "sonner";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { getApiUrl } from "@/lib/api-url";
 
 const roleIconMap: Record<string, any> = {
   Admin: Settings,
@@ -33,7 +33,7 @@ export default function RolesPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`${API_URL}/api/v1/roles`, { credentials: "include" });
+      const res = await fetch(`${getApiUrl()}/api/v1/roles`, { credentials: "include" });
       if (!res.ok) throw new Error("Failed to fetch roles");
       const data = await res.json();
       setRoles(data.data || []);
@@ -51,7 +51,7 @@ export default function RolesPage() {
     if (!deleteId) return;
     setDeleteLoading(true);
     try {
-      await fetch(`${API_URL}/api/v1/roles/${deleteId}`, { method: "DELETE", credentials: "include" });
+      await fetch(`${getApiUrl()}/api/v1/roles/${deleteId}`, { method: "DELETE", credentials: "include" });
       toast.success("Role deleted");
       fetchData();
     } catch {}
