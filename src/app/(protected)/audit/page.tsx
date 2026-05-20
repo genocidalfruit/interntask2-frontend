@@ -169,7 +169,7 @@ export default function AuditPage() {
                       <th className="text-left py-3 px-4 font-normal text-muted-foreground w-8"></th>
                       <th className="text-left py-3 px-4 font-normal text-muted-foreground">Action</th>
                       <th className="text-left py-3 px-4 font-normal text-muted-foreground">Entity</th>
-                      <th className="text-left py-3 px-4 font-normal text-muted-foreground">Actor</th>
+                      <th className="text-left py-3 pl-4 pr-8 font-normal text-muted-foreground">Actor</th>
                       <th className="text-right py-3 px-4 font-normal text-muted-foreground">Time</th>
                     </tr>
                   </thead>
@@ -202,7 +202,7 @@ export default function AuditPage() {
                             </div>
                           </td>
                           <td className="py-3 px-4 text-muted-foreground whitespace-nowrap">{log.entityType}</td>
-                          <td className="py-3 px-4 text-muted-foreground">
+                          <td className="py-3 pl-4 pr-8 text-muted-foreground">
                             <span className="inline-flex items-center gap-1 min-w-0">
                               <User className="w-3 h-3 shrink-0" />
                               <span className="truncate">{log.actor?.name || "Unknown"}</span>
